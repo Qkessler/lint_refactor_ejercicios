@@ -1,0 +1,75 @@
+* lint_refactor_ejercicios
+
+The idea of this repo is to show the possible workflow that I would follow when having students working through exercises in Python.
+
+We can use =pytest= to test the different exercises and both =black= and =flake8= to format and lint possible stylistic mistakes.
+
+To start, install the dependencies on a local environment:
+#+begin_src bash
+  python -m venv .env
+#+end_src
+
+Activate the environment:
+#+begin_src bash
+  . .env/bin/activate
+#+end_src
+
+Install the dependencies:
+#+begin_src bash
+  pip install pytest black flake8
+#+end_src
+
+Students should follow a Test Driven Development (TDD) approach when working with this repo. The students receive an empty =ejer_template.py= file with the function signatures that we use on the tests. Currently, just with the =ejer_template.py= and the =test_ejer_template.py= files, there shouldn't be any syntax errors.
+
+The student working on the exercises would then run =pytest= to see their progress:
+#+begin_src bash
+  pytest -v
+#+end_src
+
+If no functions have been implemented, the student is met with something like:
+#+begin_src bash
+  ❯ pytest -v test_ejer_template.py
+  ================================== test session starts ===================================
+  platform darwin -- Python 3.10.8, pytest-7.2.1, pluggy-1.0.0 -- /private/tmp/python-dir/.env/bin/python
+  cachedir: .pytest_cache
+  rootdir: /private/tmp/python-dir
+  collected 5 items
+
+  test_ejer_template.py::test_suma_n_primeros FAILED                                 [ 20%]
+  test_ejer_template.py::test_tabla_del_n FAILED                                     [ 40%]
+  test_ejer_template.py::test_es_primo FAILED                                        [ 60%]
+  test_ejer_template.py::test_primos_inferiores FAILED                               [ 80%]
+  test_ejer_template.py::test_esperanza_de_vida FAILED                               [100%]
+
+  ...
+
+  ================================ short test summary info =================================
+  FAILED test_ejer_template.py::test_suma_n_primeros - assert [0, 4.0, 2.66...6666666666667] == [0, 0, 0, 0]
+  FAILED test_ejer_template.py::test_tabla_del_n - AssertionError: assert [[0], [0, 1],..., 0, 0, 0, 0]] == [[], [], [], [], [], []]
+  FAILED test_ejer_template.py::test_es_primo - assert [False, False...e, False, ...] == [False, False...e, False, ...]
+  FAILED test_ejer_template.py::test_primos_inferiores - assert [[], [], [], ... [2, 3, 5, 7]] == [[], [], [], [], [], []]
+  FAILED test_ejer_template.py::test_esperanza_de_vida - AssertionError: assert [{'a': 51, 'b... 'c': 78}, {}] == [{}, {}, {}]
+  =================================== 5 failed in 0.02s ====================================
+#+end_src
+
+This means that basically we are expecting certain scenarios to be met when the exercise is sent to the professor for review. Tests should be exhaustive and cover all the edge cases that we expect. This process for the professor is also beneficial, since it removes possible bugs with the scenarios sent to the students to work on.
+
+Once functions are implemented, the student keeps running =pytest -v= and they would know all functions are correct (grade feedback) when running the same command outputs:
+#+begin_src bash
+  ❯ pytest -v test_ejercicios_introduccion.py
+  ================================== test session starts ===================================
+  platform darwin -- Python 3.10.8, pytest-7.2.1, pluggy-1.0.0 -- /private/tmp/python-dir/.env/bin/python
+  cachedir: .pytest_cache
+  rootdir: /private/tmp/python-dir
+  collected 5 items
+
+  test_ejercicios_introduccion.py::test_suma_n_primeros PASSED                       [ 20%]
+  test_ejercicios_introduccion.py::test_tabla_del_n PASSED                           [ 40%]
+  test_ejercicios_introduccion.py::test_es_primo PASSED                              [ 60%]
+  test_ejercicios_introduccion.py::test_primos_inferiores PASSED                     [ 80%]
+  test_ejercicios_introduccion.py::test_esperanza_de_vida PASSED                     [100%]
+
+  =================================== 5 passed in 0.01s ====================================
+#+end_src
+
+🎉 Finally, before sending the code for review, the student runs =./lint.sh .=, which in the background is running =black= and =flake8= to ensure certain style conventions are met.
