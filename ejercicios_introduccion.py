@@ -45,10 +45,8 @@ def primos_inferiores(numero):
 
 
 # Ejercicio 7
-def esperanza_de_vida(personas, esperanza_por_edad):
-    return {
-        nombre: edad + esperanza_por_edad[edad] for nombre, edad in personas.items()
-    }
+def esperanza_de_vida(personas, esperanza):
+    return {nombre: age + esperanza[age] for nombre, age in personas.items()}
 
 
 def main():

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-black $1
-flake8 $1
+black $@
+flake8 $@

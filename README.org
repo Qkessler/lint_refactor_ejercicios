@@ -72,4 +72,17 @@ Once functions are implemented, the student keeps running =pytest -v= and they w
   =================================== 5 passed in 0.01s ====================================
 #+end_src
 
-🎉 Finally, before sending the code for review, the student runs =./lint.sh .=, which in the background is running =black= and =flake8= to ensure certain style conventions are met.
+🎉 Finally, before sending the code for review, the student runs =./lint.sh .=, which in the background is running =black= and =flake8= to ensure certain style conventions are met. Here's a sample output:
+#+begin_src bash
+  ❯ ./lint.sh test_ejercicios_introduccion.py ejercicios_introduccion.py
+  All done! ✨ 🍰 ✨
+  2 files left unchanged.
+  ejercicios_introduccion.py:50:80: E501 line too long (84 > 79 characters)
+#+end_src
+
+The files are first formatted with the [[https://black.readthedocs.io/en/stable/][black formatter]] and then linted using [[https://flake8.pycqa.org/en/latest/][flake8]]. The /2 files left unchanged/ line means that the files are following black's style rules, while the last line on the snipped is =flake8= giving feedback on style aspects that the files can improve. If we fix the issue, we see the following output, with no warnings from =flake8=:
+#+begin_src bash
+  ❯ ./lint.sh test_ejercicios_introduccion.py ejercicios_introduccion.py
+  All done! ✨ 🍰 ✨
+  2 files left unchanged.
+#+end_src
