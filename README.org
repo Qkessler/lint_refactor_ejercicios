@@ -1,4 +1,4 @@
-* lint_refactor_ejercicios
+* tdd_student_workflow
 
 The idea of this repo is to show the possible workflow that I would follow when having students working through exercises in Python.
 
