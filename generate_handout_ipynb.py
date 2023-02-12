@@ -12,9 +12,7 @@ import sys
 
 from typing import Dict
 
-USAGE = (
-    f"Usage: {sys.argv[0]} <ipynb_file> --target [labhandout|slides]"
-)
+USAGE = f"Usage: {sys.argv[0]} <ipynb_file> --target [labhandout|slides]"
 
 args_pattern = re.compile(
     r"""
@@ -43,11 +41,11 @@ args_pattern = re.compile(
     re.VERBOSE,
 )
 
+
 def parse(arg_line: str) -> Dict[str, str]:
     args: Dict[str, str] = {}
     if match_object := args_pattern.match(arg_line):
-        args = {k: v for k, v in match_object.groupdict().items()
-                if v is not None}
+        args = {k: v for k, v in match_object.groupdict().items() if v is not None}
     return args
 
 
@@ -87,13 +85,13 @@ def prepare_handout(nb_file, target):
                         )
                         nb["cells"][i]["source"] = source_simplified
                         # print(nb["cells"][i]["source"])
-                        
+
             if target == "slides":
-               if "metadata" in cell:
-                   if "slideshow" in cell["metadata"]:
-                      if cell["metadata"]["slideshow"]["slide_type"] == "fragment":
-                          nb["cells"][i]["metadata"].pop("slideshow")
-                   
+                if "metadata" in cell:
+                    if "slideshow" in cell["metadata"]:
+                        if cell["metadata"]["slideshow"]["slide_type"] == "fragment":
+                            nb["cells"][i]["metadata"].pop("slideshow")
+
     return nb
 
 
@@ -116,7 +114,7 @@ def main():
         return
     for k, v in args.items():
         print(f"key {k}, value: {v}")
-    
+
     file_path = pathlib.Path(args["FILE"])
     target = args["TARGET"]
 
@@ -128,41 +126,27 @@ def main():
     if target == "labhandout":
         os.system(f"jupyter nbconvert --to markdown {nb_output}")
         os.system(f"jupyter nbconvert --to html {nb_output}")
-        
+
         nb_handout = file_path.parent / (file_path.stem + "_handout.ipynb")
         print(f"Nb without output for handing out: {nb_handout}")
         with open(nb_handout, "w", encoding="utf-8") as outfile:
             json.dump(clear_output(nb), outfile, ensure_ascii=False)
 
     if target == "slides":
-        slides_for_pdf = file_path.stem + "_handout" 
-        os.system(f'jupyter nbconvert {file_path} --to slides --no-prompt --TagRemovePreprocessor.remove_all_outputs_tags "remove_output" --TagRemovePreprocessor.remove_input_tags "remove_input" --SlidesExporter.reveal_theme=simple')
-        os.system(f'jupyter nbconvert {nb_output} --output {slides_for_pdf} --to slides --no-prompt --TagRemovePreprocessor.remove_all_outputs_tags "remove_output" --TagRemovePreprocessor.remove_input_tags "remove_input" --SlidesExporter.reveal_theme=simple --post serve')
-        os.rename(file_path.parent / (slides_for_pdf + ".slides.html"), file_path.parent / (slides_for_pdf + ".html")) 
-    
+        slides_for_pdf = file_path.stem + "_handout"
+        os.system(
+            f'jupyter nbconvert {file_path} --to slides --no-prompt --TagRemovePreprocessor.remove_all_outputs_tags "remove_output" --TagRemovePreprocessor.remove_input_tags "remove_input" --SlidesExporter.reveal_theme=simple'
+        )
+        os.system(
+            f'jupyter nbconvert {nb_output} --output {slides_for_pdf} --to slides --no-prompt --TagRemovePreprocessor.remove_all_outputs_tags "remove_output" --TagRemovePreprocessor.remove_input_tags "remove_input" --SlidesExporter.reveal_theme=simple --post serve'
+        )
+        os.rename(
+            file_path.parent / (slides_for_pdf + ".slides.html"),
+            file_path.parent / (slides_for_pdf + ".html"),
+        )
+
     os.remove(nb_output)
+
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
