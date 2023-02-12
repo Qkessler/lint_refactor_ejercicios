@@ -34,7 +34,8 @@ class Events:
         if self.dataframe.shape[0] > 0:
             # In some old events avro, problem: we drop them
             self.dataframe.drop(
-                index=self.dataframe.index[self.dataframe["percentage"] == ""], inplace=True
+                index=self.dataframe.index[self.dataframe["percentage"] == ""],
+                inplace=True,
             )  # hay que quitarlo
 
             self.dataframe.drop(columns=["_id", "state"], inplace=True, errors="ignore")
@@ -81,7 +82,6 @@ class Events:
 
         for i_blob, blob in enumerate(blob_list):
             if blob.size > 508:
-
                 blob_client = ContainerClient.get_blob_client(
                     events_container, blob=blob.name
                 )
@@ -93,7 +93,6 @@ class Events:
                 events_number += len(events_list)
 
                 if (events_number > MAX_EVENTS) & (i_blob > 1):
-                    
                     break
 
                 self.batch_last_events_file = blob.name
@@ -106,7 +105,6 @@ class Events:
                     )
                     events_container.delete_blob(blob.name)
 
-                    
         print(f"Number of downloaded events: {len(self.__events)}")
         events_container.close()
 
@@ -170,7 +168,6 @@ class Events:
 
     def __add_author_unit(self):
         if self.dataframe.shape[0] > 0:
-
             urls = self.dataframe["url"]
 
             url_author = urls.str.contains("/") & (urls != "/la/")

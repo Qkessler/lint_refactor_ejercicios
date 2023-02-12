@@ -71,12 +71,12 @@ class Aggregate(ABC):
 
     def extract_top10_units(self, intermediate):
         top10_units = intermediate.top10_units.copy()
-        # while Dani uses "unit" in the panel, will change 
+        # while Dani uses "unit" in the panel, will change
         top10_units["unit"] = top10_units["url"]
 
-        self.top10_units = top10_units.sort_values(
-            "num_visits", ascending=False
-        ).iloc[:10, :]
+        self.top10_units = top10_units.sort_values("num_visits", ascending=False).iloc[
+            :10, :
+        ]
 
         self.top10_units_lti = top10_units.sort_values(
             "num_visits_lti", ascending=False
@@ -101,17 +101,14 @@ class Aggregate(ABC):
             "num_visits_open", ascending=False
         ).iloc[:10, :]
 
-
     def to_json(self, path):
         folder = re.sub("aggregate.avro", "", path)
         os.makedirs(folder, exist_ok=True)
         with open(path, "a") as jsonfile:
             json.dump(self.aggregate_dict, jsonfile)
-                
+
 
 class AggregateRepository(Aggregate):
-
-
     def upload(self, container):
         super().upload(container)
         schema = aggregate_schemes["repository"]
@@ -151,7 +148,6 @@ class AggregateRepository(Aggregate):
 
 
 class AggregateAuthor(Aggregate):
-
     def upload(self, container):
         super().upload(container)
         schema = aggregate_schemes["author"]
@@ -168,7 +164,6 @@ class AggregateAuthor(Aggregate):
 
 
 class AggregateUnit(Aggregate):
-
     def upload(self, container):
         super().upload(container)
         schema = aggregate_schemes["unit"]
@@ -183,7 +178,6 @@ class AggregateUnit(Aggregate):
 
 
 class AggregateLTI(Aggregate):
-
     def upload(self, container):
         super().upload(container)
         schema = self.__modify_schema_user_wide(aggregate_schemes["lti"])
@@ -235,14 +229,12 @@ class AggregateLTI(Aggregate):
                 select_user(self.video_viz_cohort, user)
             )
             if len(user_video_viz_cohort) > 0:
-                user_aggregate.video_viz = user_video_viz_cohort 
+                user_aggregate.video_viz = user_video_viz_cohort
             user_aggregate.users = select_user(self.users, user)
         else:
-            user_aggregate.visited_completed_units = (
-                self.visited_completed_units.drop(
-                    columns=["user", "has_visited", "has_completed"]
-                ).drop_duplicates()
-            )
+            user_aggregate.visited_completed_units = self.visited_completed_units.drop(
+                columns=["user", "has_visited", "has_completed"]
+            ).drop_duplicates()
             user_aggregate.visited_completed_units.insert(5, "user", "cohort")
             user_aggregate.visited_completed_units.insert(6, "has_visited", 1)
             user_aggregate.visited_completed_units.insert(7, "has_completed", 1)
@@ -296,6 +288,3 @@ class AggregateLTI(Aggregate):
 
         self.time_user_wide = time_user_wide
         self.percentage_user_wide = percentage_user_wide
-
-
-

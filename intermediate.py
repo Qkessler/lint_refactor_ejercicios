@@ -30,13 +30,10 @@ from forma_LA.utilities import hold_same
 
 class Intermediate(ABC):
     def __init__(self, container, path, events_df, backup_container):
-        self.__intermediate = container.retrieve_blob(
-            path, backup_container
-        )
+        self.__intermediate = container.retrieve_blob(path, backup_container)
 
         self.events = events_df
         self.path = path
-
 
     @abstractmethod
     def prepare(self):
@@ -132,9 +129,9 @@ class Intermediate(ABC):
             url_top10 = self.top10_units.loc[unit, "url"]
             self.top10_units.drop(index=[unit], inplace=True)
         else:
-            url_top10 = "" 
+            url_top10 = ""
 
-        url_list = [url_top10, *(intermediate_unit.events["url"].to_list())] 
+        url_list = [url_top10, *(intermediate_unit.events["url"].to_list())]
         url_list.sort(reverse=True, key=len)
         url = url_list.pop(0)
         del url_list
@@ -232,7 +229,6 @@ class Intermediate(ABC):
             for element in objects_dict[o]:
                 element["unit"] = element.pop("url")
 
-
     @abstractmethod
     def compare(self, intermediate):
         pass
@@ -242,12 +238,21 @@ class Intermediate(ABC):
         dict_intermediate = intermediate.get_dict_object()
 
         comparison = dict()
-        comparison["num_visits"] = (dict_self["num_visits"] == dict_intermediate["num_visits"])
-        comparison["num_visits_open"] = (dict_self["num_visits_open"] == dict_intermediate["num_visits_open"])
-        comparison["num_visits_lti"] = (dict_self["num_visits_lti"] == dict_intermediate["num_visits_lti"])
-        comparison["daily_visits"] = (dict_self["daily_visits"] == dict_intermediate["daily_visits"])
+        comparison["num_visits"] = (
+            dict_self["num_visits"] == dict_intermediate["num_visits"]
+        )
+        comparison["num_visits_open"] = (
+            dict_self["num_visits_open"] == dict_intermediate["num_visits_open"]
+        )
+        comparison["num_visits_lti"] = (
+            dict_self["num_visits_lti"] == dict_intermediate["num_visits_lti"]
+        )
+        comparison["daily_visits"] = (
+            dict_self["daily_visits"] == dict_intermediate["daily_visits"]
+        )
 
         return comparison
+
 
 class IntermediateRepository(Intermediate):
     def prepare(self):
@@ -347,12 +352,13 @@ class IntermediateRepository(Intermediate):
 
         super().compare(intermediate)
         comparison = self._Intermediate__compare_num_visits(intermediate)
-        comparison = {**comparison,
-                      "top10_units": dict_self["top10_units"] == dict_intermediate["top10_units"],
-                      "top10_authors": dict_self["top10_authors"] == dict_intermediate["top10_authors"],
-                      }
+        comparison = {
+            **comparison,
+            "top10_units": dict_self["top10_units"] == dict_intermediate["top10_units"],
+            "top10_authors": dict_self["top10_authors"]
+            == dict_intermediate["top10_authors"],
+        }
         return comparison
-
 
 
 class IntermediateAuthor(Intermediate):
@@ -395,10 +401,12 @@ class IntermediateAuthor(Intermediate):
 
         super().compare(intermediate)
         comparison = self._Intermediate__compare_num_visits(intermediate)
-        comparison = {**comparison,
-                      "top10_units": dict_self["top10_units"] == dict_intermediate["top10_units"],
-                      }
+        comparison = {
+            **comparison,
+            "top10_units": dict_self["top10_units"] == dict_intermediate["top10_units"],
+        }
         return comparison
+
 
 class IntermediateUnit(Intermediate):
     def prepare(self):
@@ -443,10 +451,13 @@ class IntermediateUnit(Intermediate):
 
         super().compare(intermediate)
         comparison = self._Intermediate__compare_num_visits(intermediate)
-        comparison = {**comparison,
-                      "current_title": dict_self["current_title"] == dict_intermediate["current_title"],
-                      }
+        comparison = {
+            **comparison,
+            "current_title": dict_self["current_title"]
+            == dict_intermediate["current_title"],
+        }
         return comparison
+
 
 class IntermediateLTI(Intermediate):
     def prepare(self):
@@ -463,21 +474,35 @@ class IntermediateLTI(Intermediate):
         self.__prepare_events()
         self.__prepare_video_events()
 
-
     def compare(self, intermediate):
         dict_self = self.get_dict_object()
         dict_intermediate = intermediate.get_dict_object()
 
         comparison = dict()
-        comparison["last_event"] = (dict_self["last_event"] == dict_intermediate["last_event"])
-        comparison["visited_units"] = (dict_self["visited_units"] == dict_intermediate["visited_units"])
-        comparison["users"] = (dict_self["users"] == dict_intermediate["users"])
-        comparison["user_progress"] = (dict_self["user_progress"] == dict_intermediate["user_progress"])
-        comparison["daily_effort"] = (dict_self["daily_effort"] == dict_intermediate["daily_effort"])
+        comparison["last_event"] = (
+            dict_self["last_event"] == dict_intermediate["last_event"]
+        )
+        comparison["visited_units"] = (
+            dict_self["visited_units"] == dict_intermediate["visited_units"]
+        )
+        comparison["users"] = dict_self["users"] == dict_intermediate["users"]
+        comparison["user_progress"] = (
+            dict_self["user_progress"] == dict_intermediate["user_progress"]
+        )
+        comparison["daily_effort"] = (
+            dict_self["daily_effort"] == dict_intermediate["daily_effort"]
+        )
         # comparison["video_last_event"] = (dict_self["video_last_event"] == dict_intermediate["video_last_event"])
-        comparison["video_borders"] = (dict_self["video_borders"] == dict_intermediate["video_borders"])
-        comparison["video_current_title"] = (dict_self["video_current_title"] == dict_intermediate["video_current_title"])
-        comparison["video_current_duration"] = (dict_self["video_current_duration"] == dict_intermediate["video_current_duration"])
+        comparison["video_borders"] = (
+            dict_self["video_borders"] == dict_intermediate["video_borders"]
+        )
+        comparison["video_current_title"] = (
+            dict_self["video_current_title"] == dict_intermediate["video_current_title"]
+        )
+        comparison["video_current_duration"] = (
+            dict_self["video_current_duration"]
+            == dict_intermediate["video_current_duration"]
+        )
 
         return comparison
 
@@ -614,27 +639,22 @@ class IntermediateLTI(Intermediate):
 
     def __prepare_events(self):
         events_columns = self.events.columns.to_list()
-        
+
         self.__add_timestamp_last_event()
-        
+
         self.__add_session()
-        
+
         self.__add_time_spent()
-        
+
         self.events = self.events.loc[:, [*events_columns, "time_spent"]]
 
     def __add_timestamp_last_event(self):
-
         last_event = self.last_event.copy()
         last_event["is_last_event"] = True
 
         self.events["is_last_event"] = False
         self.events["time_spent"] = np.nan
-        self.events = pd.concat(
-            [last_event, self.events],
-            ignore_index=True
-        )
-        
+        self.events = pd.concat([last_event, self.events], ignore_index=True)
 
     def __add_session(self):
         self.events["timestamp_previous_event"] = self.events.groupby(GROUPING_VARS)[
@@ -671,7 +691,7 @@ class IntermediateLTI(Intermediate):
         if hasattr(self, "last_event") and ((self.events["session"] == 0).sum() > 0):
             last_event = self.last_event
             additional_vars = ["email", "name", "profile", "title", "activity_title"]
-            select_cols = [*GROUPING_VARS,  *additional_vars]
+            select_cols = [*GROUPING_VARS, *additional_vars]
             new_events_session_0 = self.events.loc[
                 self.events["session"] == 0, select_cols
             ].copy()
@@ -921,7 +941,7 @@ class IntermediateLTI(Intermediate):
 
             new_duration = self.video_events.groupby(grouping_vars).apply(
                 lambda x: Counter(x["duration"].astype(str))
-                )
+            )
             new_duration.name = "new_duration_freq"
 
             updated_duration = pd.concat(
@@ -1054,9 +1074,7 @@ class IntermediateLTI(Intermediate):
             [video_viz_users, self.__count_viz(user_wise=False)]
         )
 
-        cohort_user = (
-            self.users.loc[:, ["domain", "course"]].drop_duplicates()
-        )
+        cohort_user = self.users.loc[:, ["domain", "course"]].drop_duplicates()
         cohort_user["user"] = "cohort"
         cohort_user["email"] = "All students"
         cohort_user["name"] = "All students"
@@ -1065,9 +1083,7 @@ class IntermediateLTI(Intermediate):
 
         video_viz_cohort = pd.merge(video_viz_cohort, users).drop(columns="profile")
         video_viz_cohort = pd.merge(video_viz_cohort, self.visited_units)
-        video_viz_cohort = pd.merge(
-            video_viz_cohort, self.video_current_title
-        )
+        video_viz_cohort = pd.merge(video_viz_cohort, self.video_current_title)
         video_viz_cohort = pd.merge(
             video_viz_cohort,
             self.video_current_duration.drop(columns=["duration_freq"]),
@@ -1078,7 +1094,6 @@ class IntermediateLTI(Intermediate):
         ).dt.strftime("%H:%M:%S")
         return video_viz_cohort
 
-
     def __count_viz(self, user_wise=True):
         grouping_vars = [*GROUPING_VARS, "element"]
 
@@ -1088,27 +1103,25 @@ class IntermediateLTI(Intermediate):
         borders_long = pd.DataFrame(borders_c.stack(), columns=["position"])
         borders_long.index.rename([*grouping_vars, "border_type"], inplace=True)
         borders_long.reset_index(inplace=True)
-        borders_long["increment"] = 2 * (borders_long["border_type"]
-                                     == "start") - 1
+        borders_long["increment"] = 2 * (borders_long["border_type"] == "start") - 1
 
         if not user_wise:
             grouping_vars.remove("user")
 
         borders_long = borders_long.sort_values([*grouping_vars, "position"])
 
-        borders_long["users_per_video"] = borders_long.groupby(
-            grouping_vars)["user"].transform("nunique")
+        borders_long["users_per_video"] = borders_long.groupby(grouping_vars)[
+            "user"
+        ].transform("nunique")
 
-        borders_long["viz"] = borders_long.groupby(
-            grouping_vars)["increment"].cumsum()
+        borders_long["viz"] = borders_long.groupby(grouping_vars)["increment"].cumsum()
 
         borders_long.drop(columns=["border_type", "increment"], inplace=True)
 
         if not user_wise:
             borders_long["user"] = "cohort"
 
-        viz = borders_long.groupby([*grouping_vars,
-                               "position"]).last().reset_index()
+        viz = borders_long.groupby([*grouping_vars, "position"]).last().reset_index()
         viz["viz"] = viz["viz"] / viz["users_per_video"]
         viz.drop(columns="users_per_video", inplace=True)
 

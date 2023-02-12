@@ -2,7 +2,7 @@ import pandas as pd
 import io
 import json
 import os
- 
+
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -118,53 +118,54 @@ def roll_back(batch_first_events_avro_file, only_events=False):
         intermediate_container.close()
         intermediateprocessed_container.close()
 
-#-------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------
+
 
 def create_lock(message, container):
     fo = io.BytesIO()
 
     fo.write(json.dumps({"error_message": message}).encode())
-    
+
     ContainerClient.upload_blob(
-        container.container,
-        name="lock",
-        data=fo.getvalue(),
-        overwrite=True
+        container.container, name="lock", data=fo.getvalue(), overwrite=True
     )
-    
+
 
 def delete_lock(container):
-
     container.delete_blobs(pattern="^lock$")
+
 
 # --------------------------------------------------------------------------------
 
-def send_email(subject, msg): 
+
+def send_email(subject, msg):
     msg = MIMEText(msg)
-    msg['Subject'] = subject
+    msg["Subject"] = subject
     recipients = os.environ["recipients"].split(",")
-    msg['To'] = ', '.join(recipients)#os.environ["recipients"]
-    msg['From'] = os.environ["sender_email"]
+    msg["To"] = ", ".join(recipients)  # os.environ["recipients"]
+    msg["From"] = os.environ["sender_email"]
 
     context = ssl.create_default_context()
     try:
         server = smtplib.SMTP(os.environ["smtp_server"], os.environ["port"])
         # server.set_debuglevel(True)
-        server.starttls(context=context) 
+        server.starttls(context=context)
         server.login(os.environ["user"], os.environ["password"])
         server.send_message(msg)
     except Exception as e:
         print(e)
     finally:
-        server.quit() 
+        server.quit()
+
 
 def send_htmlemail(subject, msghtml):
     msg = MIMEMultipart()
-    msg['Subject'] = subject
+    msg["Subject"] = subject
     recipients = os.environ["recipients"].split(",")
-    msg['To'] = ', '.join(recipients)#os.environ["recipients"]
-    msg['From'] = os.environ["sender_email"]
-    partbody = MIMEText(msghtml,"html")
+    msg["To"] = ", ".join(recipients)  # os.environ["recipients"]
+    msg["From"] = os.environ["sender_email"]
+    partbody = MIMEText(msghtml, "html")
     msg.attach(partbody)
 
     # #Attach Document ##################
@@ -181,7 +182,7 @@ def send_htmlemail(subject, msghtml):
     # ######################################
 
     # #Attach Image ##################
-    # fp = open('accesibilidad.png', 'rb') 
+    # fp = open('accesibilidad.png', 'rb')
     # msgImage = MIMEImage(fp.read())
     # fp.close()
     # msgImage.add_header('Content-ID', '<image1>')
@@ -198,6 +199,4 @@ def send_htmlemail(subject, msghtml):
     except Exception as e:
         print(e)
     finally:
-        server.quit() 
-
-
+        server.quit()
